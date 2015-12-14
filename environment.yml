@@ -1,0 +1,16 @@
+name: assortative_mating
+dependencies:
+  - python=3.5
+  - bokeh
+  - ipython
+  - joblib
+  - jupyter
+  - matplotlib
+  - pytest
+  - scipy
+  - sphinx
+  - numpy
+  - pip:
+    - glances
+    - line_profiler
+    - tqdm

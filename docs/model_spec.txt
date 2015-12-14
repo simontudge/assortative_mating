@@ -1,0 +1,31 @@
+Model in which I investigate the hypothesis that the presence of meiotic distorters can create a selection pressure on the propensity to mate assortatively.
+
+This is a two locus model. Individuals have two genes. One determines the amount by which individuals mate assortatively. This can be a continous variable, where one means that they only ever mate with a genetically identical individual, and zero means that they mate with a random individual.
+
+The second locus is the meotic distorter locus. At this locus there are fair and cheat alleles.
+
+Meiotic drive:
+h,s and delta, which defines the dynamcis of the genetic distortion. This puts the game in one of the four fundamental types of two player games.
+
+Dynamics of assortative mating:
+Individuals have two genes, each is a real number \in [0,1]. The desired assortativity is then determined by these two genes, call them a_1 and a_2, assume, by definition that a_1 > a_2. Then the actual assortativity of the individual is given by  q * a_1 + (1-q)*a_2. Thus if q=1/2 this is simply the mean of the two alleles, if q is 1, then the larger value is completely dominant, and if q = 0 then the smaller value is completely dominant. q thus meassures the dominance of the larger assortative mating allele. To begin with set q = 1/2.
+
+Fitness of individiuals: individuals' fitness is determined soley by the meitic drive locus, the other locus only effects things indirectly.
+
+Choosing a mate: the population is divided into two equal halves. We might call one of these the females, but this is not important. Each individuals picks a mate, this is done assortatively due to the value of the desisired assortative mating. If A = 1 then they pick a clonal mate if possible, (if not possible they pick the closest thing) if A = 0 they pick a random mate. WHAT HAPPENS FOR THE INBETWEEN CASES, THIS IS MORE TRICKY. DO THEY CERTAINLY PICK AN INDIVIDUAL OF HALF RELATEDNESS, OR WITH A CERTAIN PROBABILITY ONE CLONALLY RELATED.
+
+Reproduction: Once pairing have taken place then the couples reproduce. We assign the pair a fitness, whcih is the average fitness of the two individuals. The create a number of offspring in proportion to their joint fitness. The offspring has genes based on the genotypes of each of the parents.
+
+Crossover: with probability c the two alleles at each locus break in two and are inherited potentially seprately. c = 0 is no crossover, and the haplotype is inherited as is. c=1 means they are broken up always, but could still be inherited together by chance.
+
+Class and File Structure
+
+Classes:
+
+One class for an individual. This should contain values for all of the four allels. A method for retriving fitness (with parameters passed in). A method for choosing a mate given a list of choices, and a method for reproducing. The genes, genotypes and haplotypes don't need to be objects, this is over-kill.
+
+The population can be another class, it's main field is a list of individuals. It should also have methods for new generations.
+
+Finally there should be a class for the entire model, this is a thin wrapper for the population class, but should contain the plotting functionality.
+
+Functions for helping can live in another directory. This can be functions for things like finding equilibrium of games etc.
