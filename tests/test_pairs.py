@@ -7,7 +7,7 @@ tests are quite simple.
 import unittest
 import numpy as np
 
-from code import pair, individual
+from assortative_mating import pair, individual
 
 
 class test_pair(unittest.TestCase):
@@ -86,3 +86,12 @@ class test_pair(unittest.TestCase):
 			##The child must have an a value of 1 and one of 0 and likewise for m
 			self.assertEqual( child.a1 + child.a2, 1 )
 			self.assertEqual( child.m1 + child.m2, 1 )
+
+	def test_pair_supports_indexing(self):
+		"""
+		Test that we can reffer to the two individuals via an index.
+		"""
+
+		myPair = pair(self.I1, self.I2)
+		self.assertEqual( myPair[0] , self.I1 )
+		self.assertEqual( myPair[1] , self.I2 )

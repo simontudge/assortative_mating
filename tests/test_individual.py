@@ -3,7 +3,7 @@ Script for testing the functionality of the individual class.
 
 """
 import unittest
-from code import *
+from assortative_mating import *
 import numpy as np
 from numpy import random
 

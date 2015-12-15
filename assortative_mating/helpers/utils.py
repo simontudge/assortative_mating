@@ -9,7 +9,7 @@ import numpy as np
 ##But that it is inconvinient in two way. Firstly the
 ##list chossen from must be 'flat'. i.e. no lists of
 ##list, and secondly the weight must sum to one.
-def random_choice(input_iterable, p = None, replacement = True, with_index = False):
+def random_choice(input_iterable, p = None, size = None, replacement = True, with_index = False):
 	"""
 	Choose at random from the list, potentially wieghted with the
 	list of wiegths p. Set replacement = False to sample without
@@ -17,10 +17,14 @@ def random_choice(input_iterable, p = None, replacement = True, with_index = Fal
 
 	If with_index is True the returned value is a tuple of the from
 	(index, value)
+
+	size, an integer specifing the number of times to sample the array, default None
+	Note that None returns a single element of the list, whereas 1 returns a list with_index
+	one element.
 	
 	"""
 
-	input_list = list(input_iterable)
+	input_list = np.array(input_iterable)
 
 	##Normalise the vector p
 	if p is not None:
@@ -38,7 +42,7 @@ def random_choice(input_iterable, p = None, replacement = True, with_index = Fal
 
 	##Choose the index of the array which to pick, this is necessary as the numpy
 	##function will complain if the list is not a flat list.
-	index = random.choice( range( len(input_list) ), replace = replacement, p = p_array )
+	index = random.choice( range( len(input_list) ), size = size, replace = replacement, p = p_array )
 	if with_index:
 		return index, input_list[index]
 	else:

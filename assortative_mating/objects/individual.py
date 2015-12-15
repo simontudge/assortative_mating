@@ -6,7 +6,7 @@ creating an offspring.
 """
 
 from numpy import random
-from code.helpers.utils import random_choice
+from assortative_mating.helpers.utils import random_choice
 
 class individual(object):
 	"""

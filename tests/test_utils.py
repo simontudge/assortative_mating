@@ -3,7 +3,7 @@ Tests for the file utils.py
 """
 
 import unittest
-from code.helpers.utils import *
+from assortative_mating.helpers.utils import *
 
 class test_random_choice(unittest.TestCase):
 	"""
@@ -65,6 +65,12 @@ class test_random_choice(unittest.TestCase):
 
 		index, value = random_choice( [2,3,4], with_index = True )
 		self.assertEquals( index + 2, value )
+
+	def test_random_choice_can_be_given_length(self):
+		"""
+		"""
+
+		self.assertEqual( len( random_choice( range(10), length = 20 ) ) , 20 )
 
 
 

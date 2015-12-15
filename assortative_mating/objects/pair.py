@@ -3,7 +3,7 @@ This is the file for the pairs class. A pair is an object that represents two in
 It knows the fitness of the pair, as well as how to create an offspring from that pair.
 """
 
-from code import individual
+from assortative_mating import individual
 
 class pair(object):
 	"""
@@ -36,6 +36,13 @@ class pair(object):
 	def __repr__(self):
 		return "Pair of individuals:\n"+ self.I1.__repr__() + "\n" + self.I2.__repr__()
 
+	def __getitem__(self, i):
+		"""
+		Allows for the indexing of the two individuals
+		"""
+
+		return self.pair[i]
+		
 	def fitness(self, fitness_matrix):
 		"""
 		Returns the fitness of the pair, which is simply the mean fitness of the 
