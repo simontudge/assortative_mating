@@ -8,7 +8,6 @@ dependencies:
   - matplotlib
   - pytest
   - scipy
-  - sphinx
   - numpy
   - pip:
     - glances
