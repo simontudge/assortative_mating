@@ -8,7 +8,7 @@ creating an offspring.
 from numpy import random
 from code.helpers.utils import random_choice
 
-class individual():
+class individual(object):
 	"""
 	"""
 

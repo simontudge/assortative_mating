@@ -2,3 +2,4 @@
 from .objects.individual import individual
 from .objects.population import population
 from .objects.model import model
+from .objects.pair import pair
