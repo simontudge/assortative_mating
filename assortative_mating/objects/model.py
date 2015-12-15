@@ -18,7 +18,7 @@ class model():
 	well as parameters as methods for plotting and analysis.
 	"""
 
-	def __init__(self, pop, h, s, delta, generations = 128, make_graphs = True):
+	def __init__(self, pop, h, s, delta, generations = 128, graphs = True):
 		"""
 		Construct a model, the model class contains a population, and all the parameters
 		needed to define a model. It handles iterating the model through multiple generations
@@ -41,7 +41,7 @@ class model():
 			Number of individuals that the population contains.
 		generations : int {128}
 			Number of decrete generations over which to select.
-		make_graphs : bool {True}
+		graphs : bool {True}
 			Whether or not to create the standard array of graphs
 		Raises
 		======
@@ -62,7 +62,7 @@ class model():
 		self.s = s
 		self.delta = delta
 		self.generations = generations
-		self.make_graphs = make_graphs
+		self.graphs = graphs
 		##Check input values
 		omega_00 = 1 - s
 		omega_01 = 1 - h*s
@@ -97,8 +97,19 @@ class model():
 
 	def make_graphs(self):
 		"""
+		Returns a matplotlib figure. Plots to ax if provided, otherwise creates a figure from
+		scratch.
+
+		Plots both fairness and average assortment on the same figure.
+
 		"""
-		pass
+
+		fig,ax = plt.subplots( figsize = (16,9) )
+		ax.plot( self.fairness, label = 'Fairness' )
+		ax.plot( self.desired_assortment, label = 'Desired Assortment' )
+		ax.set_xlabel( "Generations" )
+		ax.legend()
+		return fig
 
 	def go(self):
 		"""
@@ -107,14 +118,20 @@ class model():
 		"""
 
 		self.fairness = []
+		self.desired_assortment = []
 		for i in range(self.generations):
 			##Record some metrics
 			self.fairness.append( self.population.fairness)
+			self.desired_assortment.append( self.population.average_assortment )
 			##Get the next generation
 			self.population = self.population.new_generation( fitness_matrix = self.fitness_matrix, delta = self.delta )
 			
 		##Set some final metrics, which are useful for classes and functions that sweep this model
 		self.final_fairness = self.population.fairness
+		self.final_desired_assortment = self.desired_assortment[0]
+
+		if self.graphs:
+			self.make_graphs()
 
 
 		

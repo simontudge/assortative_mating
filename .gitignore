@@ -1,3 +1,5 @@
 ##Caches
 *__pycache__*
 *.cache
+##Ipython notebooks
+*.ipynb_checkpoints

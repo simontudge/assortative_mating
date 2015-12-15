@@ -6,6 +6,7 @@ from assortative_mating import model, population
 
 import unittest
 import numpy as np
+import matplotlib as mpl
 
 class test_model(unittest.TestCase):
 
@@ -29,7 +30,7 @@ class test_model(unittest.TestCase):
 		print (expected_matrix)
 		self.assertTrue( np.all( myModel.fitness_matrix == expected_matrix ) )
 
-	def test_raises_expected_valueerrors(self):
+	def test_raises_expected_valueErrors(self):
 
 		##Delta too big
 		with self.assertRaises( ValueError ):
@@ -91,9 +92,22 @@ class test_model(unittest.TestCase):
 		self.assertEqual( len( myModel.fairness ), gens )
 		self.assertEqual( fairness0, myModel.fairness[0] )
 
+	def test_records_assortment(self):
+		"""
+		Check that the model records assortment.
+		"""
+
+		gens = 26
+		pop = population.from_random(32)
+		assort0 = pop.average_assortment
+		myModel = model( pop, h = 0.4, s = 0.6, delta = 0.3, generations = gens)
+		myModel.go()
+		self.assertEqual( len( myModel.desired_assortment ), gens )
+		self.assertEqual( assort0, myModel.desired_assortment[0] )
+
 	def test_model_sets_final_results(self):
 		"""
-		The othe classes will be looing for certain key words after the simulation has stopped.
+		The other classes will be looking for certain key words after the simulation has stopped.
 		Check that they exist, and are sensible vaules.
 		"""
 
@@ -101,3 +115,17 @@ class test_model(unittest.TestCase):
 		myModel.go()
 		self.assertGreaterEqual( myModel.final_fairness, 0 )
 		self.assertLessEqual( myModel.final_fairness, 1 )
+
+		self.assertGreaterEqual( myModel.final_desired_assortment, 0 )
+		self.assertLessEqual( myModel.final_desired_assortment, 1 )
+
+	def test_make_graph_returns_matplotlib_figure(self):
+		"""
+		Simply assert that the function returns a figure.
+
+		"""
+
+		myModel = model.from_random_pop( 16, 0.4, 0.5, 0.1, graphs = False )
+		myModel.go()
+		fig = myModel.make_graphs()
+		self.assertIsInstance( fig, mpl.figure.Figure )
