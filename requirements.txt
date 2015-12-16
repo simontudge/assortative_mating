@@ -1,0 +1,4 @@
+ipython
+matplotlib
+pytest
+numpys

@@ -3,8 +3,7 @@ install:
 
 setup:
 	#source activate assortative_mating
-	##Why isn't this working!?
-	export PYTHONPATH="$HOME/evolution_of_assortative_mating/code:$PYTHONPATH"
+	export PYTHONPATH="${PWD}:${PYTHONPATH}"
 
 test:
 	py.test --cov-report term-missing --cov-report html --cov=assortative_mating tests/
