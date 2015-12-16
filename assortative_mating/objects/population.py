@@ -5,8 +5,8 @@ for splitting and pairing the population, and seleticing the next generation.
 
 """
 
-from assortative_mating import individual
-from assortative_mating.objects.pair import pair
+from assortative_mating import Individual
+from assortative_mating.objects.pair import Pair
 from assortative_mating.helpers.utils import random_choice
 
 import numpy as np
@@ -16,7 +16,7 @@ try:
 except ImportError:
 	pass
 
-class population(object):
+class Population(object):
 	"""
 	Class representing a population. This is essentially a wrapper for a list of
 	individuals, but contains methods for pairing the individuals, mating them
@@ -52,7 +52,7 @@ class population(object):
 		Initialise a population with a given size with random individuals.
 
 		"""
-		individuals = [ individual.from_random() for _ in range(size) ]
+		individuals = [ Individual.from_random() for _ in range(size) ]
 		return cls( individuals )
 
 	def divide_population(self):
@@ -77,7 +77,7 @@ class population(object):
 		for female in self.females:
 			index, male = female.choose_mate( self.males )
 			##Make a pair
-			new_pair = pair( female, male )
+			new_pair = Pair( female, male )
 			pairs.append( new_pair )
 			##Remove the male from the list of males
 			self.males.pop(index)
@@ -92,7 +92,7 @@ class population(object):
 		fitnesses = [ p.fitness( fitness_matrix ) for p in self.pairs ]
 		parents = random_choice( self.pairs, p = fitnesses, size = self.total_individuals )
 		children = [ p.make_child(delta) for p in parents ]
-		return population( children )
+		return Population( children )
 
 	##########Metrics############
 

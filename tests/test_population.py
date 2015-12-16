@@ -3,7 +3,7 @@ File for testing the population class.
 """
 
 import unittest
-from assortative_mating import population, individual, pair
+from assortative_mating import Population, Individual, Pair
 
 import numpy as np
 import matplotlib as mpl
@@ -14,15 +14,15 @@ class test_population(unittest.TestCase):
 		"""
 		Make some dummy lists of individuals and popualtions, that can be tested repeastedly.
 		"""
-		self.random_individuals = [ individual.from_random() for _ in range(128) ]
-		self.random_pop = population.from_random(128)
+		self.random_individuals = [ Individual.from_random() for _ in range(128) ]
+		self.random_pop = Population.from_random(128)
 
-		I1 = individual( 1,1 , 0,0 )
-		I2 = individual( 1,1 , 0,0 )
-		I3 = individual( 1,0 , 0,1 )
-		I4 = individual( 0,0 , 1,0 ) 
+		I1 = Individual( 1,1 , 0,0 )
+		I2 = Individual( 1,1 , 0,0 )
+		I3 = Individual( 1,0 , 0,1 )
+		I4 = Individual( 0,0 , 1,0 ) 
 
-		self.small_pop = population( [I1,I2,I3,I4] ) 
+		self.small_pop = Population( [I1,I2,I3,I4] ) 
 
 	def tearDown(self):
 		pass
@@ -31,8 +31,8 @@ class test_population(unittest.TestCase):
 		"""
 		Test that the population can be initialised from a list of individuals.
 		"""
-		myPop = population( self.random_individuals )
-		self.assertIsInstance( myPop, population )
+		myPop = Population( self.random_individuals )
+		self.assertIsInstance( myPop, Population )
 
 	def test_can_be_initialised_from_random(self):
 		"""
@@ -40,8 +40,8 @@ class test_population(unittest.TestCase):
 		
 		"""
 
-		myPop = population.from_random( size = 128 )
-		self.assertIsInstance(myPop, population)
+		myPop = Population.from_random( size = 128 )
+		self.assertIsInstance(myPop, Population)
 
 	def test_initialiser_raises_value_error_with_odd_individuals(self):
 		"""
@@ -49,12 +49,12 @@ class test_population(unittest.TestCase):
 		is raised if this is not the case.
 		"""
 
-		list_of_individuals = [ individual.from_random() for _ in range(127) ]
+		list_of_individuals = [ Individual.from_random() for _ in range(127) ]
 		with self.assertRaises(ValueError):
-			myPop = population( list_of_individuals )
+			myPop = Population( list_of_individuals )
 
 		with self.assertRaises(ValueError):
-			myPop = population.from_random(127)
+			myPop = Population.from_random(127)
 
 	def test_population_length_works(self):
 		"""
@@ -72,8 +72,8 @@ class test_population(unittest.TestCase):
 		self.assertEqual( len( self.random_pop.females ) , 64 )
 		self.assertEqual( len( self.random_pop.males ) , 64 )
 
-		self.assertIsInstance( self.random_pop.females[4], individual )
-		self.assertIsInstance( self.random_pop.males[12], individual )
+		self.assertIsInstance( self.random_pop.females[4], Individual )
+		self.assertIsInstance( self.random_pop.males[12], Individual )
 
 	def test_pair_population(self):
 		"""
@@ -84,7 +84,7 @@ class test_population(unittest.TestCase):
 
 		self.random_pop.pair_population()
 		self.assertEqual( len( self.random_pop.pairs ) , 64 )
-		self.assertIsInstance( self.random_pop.pairs[16], pair  )
+		self.assertIsInstance( self.random_pop.pairs[16], Pair  )
 
 	def test_pairing_is_sensible(self):
 		"""
@@ -92,7 +92,7 @@ class test_population(unittest.TestCase):
 		should be roughly equal to the average value of desired assortment.
 		"""
 		##Start fro scratch, incase this messes with something else
-		pop = population.from_random(10000)
+		pop = Population.from_random(10000)
 		pop.pair_population()
 		x = [ p[0].phenotypic_value for p in pop.pairs ]
 		y = [ p[1].phenotypic_value for p in pop.pairs ]
@@ -135,7 +135,7 @@ class test_population(unittest.TestCase):
 		fitness_matrix = np.array( [[0.,0.1],[0.1,1.1]] )
 
 		new_pop = self.random_pop.new_generation(fitness_matrix, delta = 0.1)
-		self.assertIsInstance(new_pop, population)
+		self.assertIsInstance(new_pop, Population)
 		self.assertEqual( len(new_pop), len( self.random_pop ) )
 
 	def test_next_gen_returns_sensible_children(self):
@@ -145,12 +145,12 @@ class test_population(unittest.TestCase):
 		"""
 
 		##All the individuals want maximum assortment
-		I1 = individual( 1,1, 0, 0 )
-		I2 = individual( 1,1, 0, 1 )
-		I3 = individual( 1,1, 1, 1 )
+		I1 = Individual( 1,1, 0, 0 )
+		I2 = Individual( 1,1, 0, 1 )
+		I3 = Individual( 1,1, 1, 1 )
 
 		##A popwith two of each kind should pair up exactly...
-		pop = population( [I1,I1,I2,I2,I3,I3] )
+		pop = Population( [I1,I1,I2,I2,I3,I3] )
 		##...so long as we set this bit by hand
 		pop.males = [I1,I2,I3]
 		pop.females = [I1,I2,I3]

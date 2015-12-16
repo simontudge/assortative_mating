@@ -8,8 +8,11 @@ creating an offspring.
 from numpy import random
 from assortative_mating.helpers.utils import random_choice
 
-class individual(object):
+class Individual(object):
 	"""
+	Class representing a single individual. An individual has four allele at two loci.
+	It is thus a diploid individual. It is responsible for choosing a mate, and for 
+	producing gametes. It also knows its own fitness.
 	"""
 
 	def __init__(self, a1, a2, m1, m2, *, q = 0.5, crossover = 0):
@@ -192,3 +195,13 @@ class individual(object):
 		Mutate the gamete according to some rules I have not yet decided.
 		"""
 		pass
+
+########Some helper methods for the individual, if there are many of these migtht consider having
+#them in a seperate file, e.g. helpers.individual_helpers. For now just have them here.
+
+def constant_assortment_individual( assortment, **kwargs):
+	"""Returns an individual with specifed constant assortment.
+	Assortment must be between 0 and 1, inclusive. Can specify both
+	q and crossover via the **kwargs.
+	"""
+	return Individual( assortment, assortment, random.randint(2), random.randint(2), **kwargs )

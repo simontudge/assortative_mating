@@ -1,6 +1,6 @@
 """
 File containing the class for the model. The model class is a thin-ish
-wrapper for a population, but knows how to repeatedly call its methods in
+wrapper for a Population, but knows how to repeatedly call its methods in
 order to simulate many generations. It knows what to record, and provides
 some methods for creating graphs etc.
 
@@ -10,9 +10,9 @@ This is also where the parameters of the model live.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from assortative_mating import population
+from assortative_mating import Population
 
-class model():
+class Model():
 	"""
 	The full model. Contains a population and methods for running simulation, as
 	well as parameters as methods for plotting and analysis.
@@ -29,7 +29,7 @@ class model():
 			Any instance of the population class.
 		h : float
 			Standard parameter from population genetics. Determines the extend of over/under
-			dominance. Often constrained to be between 0 and 1, although not a strict requirment.
+			dominance. Often constrained to be between 0 and 1, although not a strict requiresment.
 		s : float
 			Standard parameter from population genetics, determines the extent to which
 			the less fit homozygote is less fit than the fitter one.
@@ -57,7 +57,7 @@ class model():
 		if h*s > 1:
 			raise ValueError("h*s must be greater than 0, got {}".format(h*s))
 		##Set all input parameters
-		self.population = pop
+		self.Population = pop
 		self.h = h
 		self.s = s
 		self.delta = delta
@@ -71,8 +71,8 @@ class model():
 		self.fitness_matrix = np.array( [[ omega_00, omega_01 ],[ omega_10, omega_11 ] ] )
 		##Other usuful parametes
 		self.size = pop.total_individuals
-		##Save the intial state of the population
-		self.pop0 = self.population
+		##Save the intial state of the Population
+		self.pop0 = self.Population
 
 	def __repr__(self):
 		"""
@@ -92,8 +92,30 @@ class model():
 		*args, **kwargs :
 			passed to default constructor of model
 		"""
-		pop = population.from_random(size)
-		return model( pop, *args, **kwargs )
+		pop = Population.from_random(size)
+		return Model( pop, *args, **kwargs )
+
+	@classmethod
+	def from_function(cls, fn, size, *args, **kwargs):
+		"""
+		Accepts any function that returns an individual and calls it repeatedly to make
+		a population.
+		Inputs
+		======
+		fn : callable
+			A function that accepts no arguments and returns an individual.
+		size : int
+			An even integer that determines the size of the population.
+		*args, ** kwargs :
+			Passed to the model constructor. Must contain h, s and delta at a minimum.
+
+		"""
+		##Make a list of individuals
+		inds = [ fn() for _ in range(size) ]
+		##Make a population of the necessary size
+		pop = Population( inds )
+		##Make the model from the population
+		return cls( pop, *args, **kwargs )
 
 	def make_graphs(self):
 		"""
@@ -121,13 +143,13 @@ class model():
 		self.desired_assortment = []
 		for i in range(self.generations):
 			##Record some metrics
-			self.fairness.append( self.population.fairness)
-			self.desired_assortment.append( self.population.average_assortment )
+			self.fairness.append( self.Population.fairness)
+			self.desired_assortment.append( self.Population.average_assortment )
 			##Get the next generation
-			self.population = self.population.new_generation( fitness_matrix = self.fitness_matrix, delta = self.delta )
+			self.Population = self.Population.new_generation( fitness_matrix = self.fitness_matrix, delta = self.delta )
 			
 		##Set some final metrics, which are useful for classes and functions that sweep this model
-		self.final_fairness = self.population.fairness
+		self.final_fairness = self.Population.fairness
 		self.final_desired_assortment = self.desired_assortment[0]
 
 		if self.graphs:

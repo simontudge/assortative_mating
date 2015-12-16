@@ -1,11 +1,12 @@
 """
-Script for testing the functionality of the individual class.
+Script for testing the functionality of the Individual class.
 
 """
 import unittest
 from assortative_mating import *
 import numpy as np
 from numpy import random
+from assortative_mating.objects.individual import constant_assortment_individual
 
 class test_individual(unittest.TestCase):
 
@@ -17,15 +18,15 @@ class test_individual(unittest.TestCase):
 
 	def test_individual_can_be_constructed(self):
 		"""
-		Simply gives the individual calls some constants and asserts that
-		the individual has been constructed correctly.
+		Simply gives the Individual calls some constants and asserts that
+		the Individual has been constructed correctly.
 
 		"""
 		a1, a2 = ( 0.2, 0.5 )
 		m1, m2 = ( 0, 1 )
-		newIndividual = individual( a1, a2, m1, m2 )
+		newIndividual = Individual( a1, a2, m1, m2 )
 
-		self.assertIsInstance( newIndividual, individual )
+		self.assertIsInstance( newIndividual, Individual )
 		self.assertEquals( a1, newIndividual.a1 )
 		self.assertEquals( a2, newIndividual.a2 )
 		self.assertEquals( m1, newIndividual.m1 )
@@ -33,7 +34,7 @@ class test_individual(unittest.TestCase):
 
 	def test_individual_raises_ValueError_with_invalid_genes(self):
 		"""
-		Test that the individual constructor raises ValueError when passed
+		Test that the Individual constructor raises ValueError when passed
 		a value of a gene outside of the permitted range. 
 		
 		"""
@@ -46,16 +47,16 @@ class test_individual(unittest.TestCase):
 		valid_m = 1
 
 		with self.assertRaises(ValueError):
-			newIndividual = individual( invalid_a1, valid_a, valid_m, valid_m )
+			newIndividual = Individual( invalid_a1, valid_a, valid_m, valid_m )
 
 		with self.assertRaises(ValueError):
-			newIndividual = individual( valid_a, invalid_a2, valid_m, valid_m )
+			newIndividual = Individual( valid_a, invalid_a2, valid_m, valid_m )
 
 		with self.assertRaises(ValueError):
-			newIndividual = individual( valid_a, valid_a, invalid_m1, valid_m )
+			newIndividual = Individual( valid_a, valid_a, invalid_m1, valid_m )
 
 		with self.assertRaises(ValueError):
-			newIndividual = individual( valid_a, valid_a, valid_m, invalid_m2 )
+			newIndividual = Individual( valid_a, valid_a, valid_m, invalid_m2 )
 
 
 	def test_random_constructor(self):
@@ -65,17 +66,17 @@ class test_individual(unittest.TestCase):
 
 		"""
 		
-		##Make an individual from random
-		newIndividual = individual.from_random()
-		self.assertIsInstance( newIndividual, individual )
+		##Make an Individual from random
+		newIndividual = Individual.from_random()
+		self.assertIsInstance( newIndividual, Individual )
 
-		##Make an array of random individuals and check they lie within reasonable
+		##Make an array of random Individuals and check they lie within reasonable
 		##bounds
-		all_individuals = [ individual.from_random() for i in range( 1000 ) ]
-		a1s = [ al.a1 for al in all_individuals ]
-		a2s = [ al.a2 for al in all_individuals ]
-		m1s = [ al.m1 for al in all_individuals ]
-		m2s = [ al.m2 for al in all_individuals ]
+		all_Individuals = [ Individual.from_random() for i in range( 1000 ) ]
+		a1s = [ al.a1 for al in all_Individuals ]
+		a2s = [ al.a2 for al in all_Individuals ]
+		m1s = [ al.m1 for al in all_Individuals ]
+		m2s = [ al.m2 for al in all_Individuals ]
 
 		##These are generated from random, so the mean should be close to 0.5
 		self.assertAlmostEqual( np.mean(a1s), 0.5, places = 1 )
@@ -87,17 +88,17 @@ class test_individual(unittest.TestCase):
 
 	def test_desired_assortment(self):
 		"""
-		An individual should have the desired assortment given by q*a1 + (1-q)*a2
+		An Individual should have the desired assortment given by q*a1 + (1-q)*a2
 		Where a1 is the larger of the two alleles.
 
 		"""
 
 		##Do this by testing a few standard cases
-		I1 = individual( 0.4, 0.7, 1, 1 )
-		I2 = individual( 0.4, 0.7, 1, 1, q = 0.7 )
-		I3 = individual( 0.7, 0.0, 1, 0 )
-		I4 = individual( 0.7, 0.0, 1, 0, q = 1. )
-		I5 = individual( 0.7, 0.0, 1, 0, q = 0. )
+		I1 = Individual( 0.4, 0.7, 1, 1 )
+		I2 = Individual( 0.4, 0.7, 1, 1, q = 0.7 )
+		I3 = Individual( 0.7, 0.0, 1, 0 )
+		I4 = Individual( 0.7, 0.0, 1, 0, q = 1. )
+		I5 = Individual( 0.7, 0.0, 1, 0, q = 0. )
 
 		##Using the default value of one half
 		self.assertEquals( I1.desired_assortment, 0.5*( 0.4 + 0.7 ) )
@@ -109,15 +110,15 @@ class test_individual(unittest.TestCase):
 
 	def test_phenotypic_value(self):
 		"""
-		Tests the individuals phenotypic. This is straightforward, I just need to 
+		Tests the Individuals phenotypic. This is straightforward, I just need to 
 		comapre with the 4 possible scenarios.
 		
 		"""
 
-		I1 = individual( 0.4, 0.7, 1, 1 )
-		I2 = individual( 0.4, 0.7, 1, 0 )
-		I3 = individual( 0.7, 0.0, 0, 1 )
-		I4 = individual( 0.7, 0.0, 0, 0 )
+		I1 = Individual( 0.4, 0.7, 1, 1 )
+		I2 = Individual( 0.4, 0.7, 1, 0 )
+		I3 = Individual( 0.7, 0.0, 0, 1 )
+		I4 = Individual( 0.7, 0.0, 0, 0 )
 
 		self.assertEquals( I1.phenotypic_value, 1 )
 		self.assertEquals( I2.phenotypic_value, 0.5 )
@@ -126,24 +127,24 @@ class test_individual(unittest.TestCase):
 
 	def test_choose_mate(self):
 		"""
-		Test the choose mate function. We create some dummy individuals, and one dummy
-		list of individuals to choose from. We check that in each case the expected mate
+		Test the choose mate function. We create some dummy Individuals, and one dummy
+		list of Individuals to choose from. We check that in each case the expected mate
 		chossen is (statistically) of the right type.
 		"""
 
 		#There should be plenty to choose from here so no issues
-		mates = [ individual.from_random() for i in range( 128 ) ]
+		mates = [ Individual.from_random() for i in range( 128 ) ]
 		##Calculate the average phenotypic value
 		p_values = [m.phenotypic_value for m in mates]
 		mean_p = np.mean(p_values)
 
-		##An individuals with desired assortment of 1
+		##An Individuals with desired assortment of 1
 		#and phenotpye of one
-		I_max_one = individual( 1, 1, 1, 1 )
+		I_max_one = Individual( 1, 1, 1, 1 )
 		##Likewise but with phentype equal 1/2
-		I_max_half = individual( 1, 1, 0, 1 )
+		I_max_half = Individual( 1, 1, 0, 1 )
 		##And with phenotpye zero
-		I_max_zero = individual( 1, 1, 0, 0)
+		I_max_zero = Individual( 1, 1, 0, 0)
 
 		#The function should return a tuple, the index of the mate, and
 		##the mate itself, hence the index 1
@@ -152,37 +153,37 @@ class test_individual(unittest.TestCase):
 		self.assertEquals( I_max_zero.choose_mate(mates)[1].phenotypic_value, 0. )
 
 		##Now look at a random chooser, he should pick a value close to the mean
-		I_min = individual( 0, 0, 1, 0 )
+		I_min = Individual( 0, 0, 1, 0 )
 		choices = [ I_min.choose_mate( mates )[1].phenotypic_value for _ in range( 50000 ) ]
 		self.assertAlmostEqual( np.mean(choices), mean_p, places = 2)
 
-		##In general the expected value for an individual with desired assortment A
+		##In general the expected value for an Individual with desired assortment A
 		##and phenotypic value p, given a mean phenotypic value p_bar, should be equal
 		##to: A*p + (1-A)*p_bar.
 		A = random.random()
-		I = individual( A, A, random.randint(2), random.randint(2) )
+		I = Individual( A, A, random.randint(2), random.randint(2) )
 		P = I.phenotypic_value
 		expected = A*P + ( 1 - A )*mean_p
 		measured = np.mean( [ I.choose_mate(mates)[1].phenotypic_value for _ in range(50000) ] )
 		self.assertAlmostEqual( expected, measured, places = 2 )
 
 		##Check behaviour when there is no one appropriate to pick
-		I = individual( 1, 1, 1, 1 )
-		mates = [ individual(0,1,0,1), individual(0,1,1,0) ]
+		I = Individual( 1, 1, 1, 1 )
+		mates = [ Individual(0,1,0,1), Individual(0,1,1,0) ]
 		self.assertEquals( I.choose_mate( mates )[1].phenotypic_value, 0.5 )
 
 	def test_make_gamete_without_crossover(self):
 		"""
-		Call the individuals make gamete method. This should return a haplotype.
+		Call the Individuals make gamete method. This should return a haplotype.
 		The probability of each halpotype should depend on the value of delta.
 
 		"""
 
-		##Some example individuals
-		I0 = individual( 1, 0, 0, 0 )
-		I1 = individual( 1, 1, 0, 1 ) 
-		I2 = individual( 0, 1, 1, 0 ) 
-		I3 = individual( 0, 0, 1, 1 )
+		##Some example Individuals
+		I0 = Individual( 1, 0, 0, 0 )
+		I1 = Individual( 1, 1, 0, 1 ) 
+		I2 = Individual( 0, 1, 1, 0 ) 
+		I3 = Individual( 0, 0, 1, 1 )
 
 		#With delta = 0 these should be chossen at random
 		delta = 0
@@ -215,15 +216,15 @@ class test_individual(unittest.TestCase):
 		"""
 		
 		crossover = 0
-		#Test individual
-		I = individual(1,0,1,0, crossover = crossover)
+		#Test Individual
+		I = Individual(1,0,1,0, crossover = crossover)
 		gametes = [ I.make_gamete(delta = 0) for _ in range(1000) ]
 		self.assertNotIn( (1,0), gametes )
 		self.assertNotIn( (0,1), gametes )
 
 		crossover = 0.6
-		#Test individual
-		I = individual(1,0,1,0, crossover = crossover)
+		#Test Individual
+		I = Individual(1,0,1,0, crossover = crossover)
 		##Wtih zero delta we should see the haplotype (1,1) more often than the
 		##haplotype (1,0). 60% of the time we'll choose at random, so we should see
 		##the haplotype 1,0 15% of the time
@@ -233,24 +234,24 @@ class test_individual(unittest.TestCase):
 
 		crossover = 1.0
 		##Regardless of delta we should see the two variants of a appearing equally often
-		I = individual(1,0,1,0, crossover = crossover)
+		I = Individual(1,0,1,0, crossover = crossover)
 		gametes = [ I.make_gamete(delta = random.random() ) for _ in range(total_samples) ]
 		ms = [ g[0] for g in gametes ]
 		self.assertAlmostEqual( ms.count(1)/total_samples, 0.5, places = 2 )
 
-	def test_fintess_is_correct(self):
+	def test_fitness_is_correct(self):
 		"""
-		Test that the individual computes its fintess correctly from a matrix.
+		Test that the Individual computes its fintess correctly from a matrix.
 
 		"""
 
 		##The matix is assumed to be symmetric
 		fitness_matrix = np.array( [ [1.1 , 0.1 ],[0.1, 0.0] ] )
 
-		I0 = individual( 1,1, 0, 0 )
-		I1 = individual( 1,1, 0, 1 )
-		I2 = individual( 1,1, 1, 0 )
-		I3 = individual( 1,1, 1, 1 )
+		I0 = Individual( 1,1, 0, 0 )
+		I1 = Individual( 1,1, 0, 1 )
+		I2 = Individual( 1,1, 1, 0 )
+		I3 = Individual( 1,1, 1, 1 )
 
 		self.assertEqual( I0.fitness(fitness_matrix), 1.1 )
 		self.assertEqual( I1.fitness(fitness_matrix), 0.1 )
@@ -264,3 +265,21 @@ class test_mutation(unittest.TestCase):
 		Test that the mutation of gametes behaves as expected.
 		"""
 		pass
+
+class test_individual_helpers(unittest.TestCase):
+	"""
+	Class for testing all the helper functions in the Individual.py file.
+	"""
+
+	def setUp(self):
+		pass
+
+	def test_can_create_constant_assortment_individual(self):
+		"""
+		Test that we can return an Individual with constant assortment.
+		"""
+
+		inds = [ constant_assortment_individual(0.3, crossover = 0.3) for _ in range(100) ]
+		self.assertAlmostEqual( np.mean( [ i.desired_assortment for i in inds] ), 0.3 )
+		self.assertAlmostEqual( np.var( [ i.desired_assortment for i in inds] ), 0. )
+		self.assertEqual( inds[0].crossover, 0.3 )

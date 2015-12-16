@@ -7,7 +7,7 @@ tests are quite simple.
 import unittest
 import numpy as np
 
-from assortative_mating import pair, individual
+from assortative_mating import Pair, Individual
 
 
 class test_pair(unittest.TestCase):
@@ -16,8 +16,8 @@ class test_pair(unittest.TestCase):
 		"""
 		Setup by creating some dummy individuals that can be called later.
 		"""
-		self.I1 = individual( 1,0, 0, 1 )
-		self.I2 = individual( 1,1, 0, 0 )
+		self.I1 = Individual( 1,0, 0, 1 )
+		self.I2 = Individual( 1,1, 0, 0 )
 
 	def tearDown(self):
 		pass
@@ -27,8 +27,8 @@ class test_pair(unittest.TestCase):
 		Test that the basic constructor works by passing two individuals.
 		
 		"""
-		myPair = pair(self.I1, self.I2)
-		self.assertIsInstance(myPair, pair)
+		myPair = Pair(self.I1, self.I2)
+		self.assertIsInstance(myPair, Pair)
 
 	def test_raise_TypeError_if_inputs_not_individuals(self):
 		"""
@@ -37,17 +37,17 @@ class test_pair(unittest.TestCase):
 		"""
 
 		with self.assertRaises( TypeError ):
-			pair( self.I1, 3 )
+			Pair( self.I1, 3 )
 		with self.assertRaises( TypeError ):
-			pair( (1,1,0,1), self.I2 )
+			Pair( (1,1,0,1), self.I2 )
 
 	def test_can_be_constructed_from_random(self):
 		"""
 		Call the random constructor and check that it returns the right type.
 
 		"""
-		myPair = pair.from_random()
-		self.assertIsInstance( myPair, pair )
+		myPair = Pair.from_random()
+		self.assertIsInstance( myPair, Pair )
 
 	def test_fitness_is_mean_of_individual(self):
 		"""
@@ -55,7 +55,7 @@ class test_pair(unittest.TestCase):
 		correct value simply by computing by hand.
 		
 		"""
-		myPair = pair( self.I1, self.I2 )
+		myPair = Pair( self.I1, self.I2 )
 		fitness_matrix = np.array( [ [ 1.1, 0.1 ],[0.1, 0 ] ] )
 		pair_fitness = myPair.fitness( fitness_matrix )
 		expected = 0.6
@@ -68,18 +68,18 @@ class test_pair(unittest.TestCase):
 
 		"""
 
-		myPair = pair( self.I1, self.I2 )
+		myPair = Pair( self.I1, self.I2 )
 		child = myPair.make_child(delta = 0.5)
-		self.assertIsInstance(child, individual)
+		self.assertIsInstance(child, Individual)
 
 	def test_make_child_return_sensible_genes(self):
 		"""
 		Use an extreme case to test that make child is not doing something silly.
 		
 		"""
-		I1 = individual(1,1,1,1)
-		I2 = individual(0,0,0,0)
-		myPair = pair(I1,I2)
+		I1 = Individual(1,1,1,1)
+		I2 = Individual(0,0,0,0)
+		myPair = Pair(I1,I2)
 		##Repeat a few time to be safe
 		for _ in range(64):
 			child = myPair.make_child(delta = 0.5)
@@ -92,6 +92,6 @@ class test_pair(unittest.TestCase):
 		Test that we can reffer to the two individuals via an index.
 		"""
 
-		myPair = pair(self.I1, self.I2)
+		myPair = Pair(self.I1, self.I2)
 		self.assertEqual( myPair[0] , self.I1 )
 		self.assertEqual( myPair[1] , self.I2 )

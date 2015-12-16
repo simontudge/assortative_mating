@@ -3,9 +3,9 @@ This is the file for the pairs class. A pair is an object that represents two in
 It knows the fitness of the pair, as well as how to create an offspring from that pair.
 """
 
-from assortative_mating import individual
+from assortative_mating import Individual
 
-class pair(object):
+class Pair(object):
 	"""
 	Object representing a pair. This is simply a 2-tuple of individuals,
 	together with methods for determining the fitness of the individuals,
@@ -17,7 +17,7 @@ class pair(object):
 		"""
 		Create a pair object from two individuals, I1 and I2.
 		"""
-		if ( not isinstance( I1, individual) ) or ( not isinstance(I2, individual) ):
+		if ( not isinstance( I1, Individual) ) or ( not isinstance(I2, Individual) ):
 			raise TypeError("Both inputs must be of type individual")
 		self.I1 = I1
 		self.I2 = I2
@@ -31,7 +31,7 @@ class pair(object):
 		testing perposes.
 
 		"""
-		return cls( individual.from_random(), individual.from_random() )
+		return cls( Individual.from_random(), Individual.from_random() )
 
 	def __repr__(self):
 		return "Pair of individuals:\n"+ self.I1.__repr__() + "\n" + self.I2.__repr__()
@@ -58,4 +58,4 @@ class pair(object):
 		"""
 		a1, m1 = self.I1.make_gamete(delta = delta)
 		a2, m2 = self.I2.make_gamete(delta = delta)
-		return individual(a1,a2, m1, m2)
+		return Individual(a1,a2, m1, m2)

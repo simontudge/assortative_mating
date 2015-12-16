@@ -1,8 +1,8 @@
 """
-Collection of tests for the model class.
+Collection of tests for the Model class.
 """
 
-from assortative_mating import model, population
+from assortative_mating import Model, Population, Individual
 
 import unittest
 import numpy as np
@@ -11,7 +11,7 @@ import matplotlib as mpl
 class test_model(unittest.TestCase):
 
 	def setUp(self):
-		self.random_pop = population.from_random(128)
+		self.random_pop = Population.from_random(128)
 
 	def tearDown(self):
 		pass
@@ -22,8 +22,8 @@ class test_model(unittest.TestCase):
 		model constructs.
 		"""
 		h,s,delta = 0.5, 0.4, 0.3
-		myModel = model( self.random_pop, h, s, delta )
-		self.assertIsInstance( myModel, model )
+		myModel = Model( self.random_pop, h, s, delta )
+		self.assertIsInstance( myModel, Model )
 		##This is the expected outcome of the fitness matrix
 		expected_matrix = np.array([ [ 1 - s, 1 - h*s ], [ 1 - h*s, 1 ] ])
 		print (myModel.fitness_matrix)
@@ -34,48 +34,62 @@ class test_model(unittest.TestCase):
 
 		##Delta too big
 		with self.assertRaises( ValueError ):
-			model( self.random_pop, h = 0.5, s = 0.5, delta = 1.1 )
+			Model( self.random_pop, h = 0.5, s = 0.5, delta = 1.1 )
 
 		##Delta too small
 		with self.assertRaises( ValueError ):
-			model( self.random_pop, h = 0.5, s = 0.5, delta = -.1 )		
+			Model( self.random_pop, h = 0.5, s = 0.5, delta = -.1 )		
 
 		##s too big
 		with self.assertRaises( ValueError ):
-			model( self.random_pop, h = 0.5, s = 1.1, delta = 0.9 )		
+			Model( self.random_pop, h = 0.5, s = 1.1, delta = 0.9 )		
 
 		##s too small
 		with self.assertRaises( ValueError ):
-			model( self.random_pop, h = 0.5, s = -0.05, delta = 0.9 )
+			Model( self.random_pop, h = 0.5, s = -0.05, delta = 0.9 )
 
 		##h*s too big
 		with self.assertRaises( ValueError ):
-			model( self.random_pop, h = 1.5, s = 0.9, delta = 0.9 )
+			Model( self.random_pop, h = 1.5, s = 0.9, delta = 0.9 )
 
 	def test_can_construct_with_random_pop(self):
 		"""
 		Assert that we can constuct the class from a random population.
 		"""
-		myModel = model.from_random_pop( 16, h = 0.4, s = 0.4, delta =0.2)
-		self.assertIsInstance( myModel, model )
+		myModel = Model.from_random_pop( 16, h = 0.4, s = 0.4, delta =0.2)
+		self.assertIsInstance( myModel, Model )
 		self.assertEqual( myModel.size, 16 )
 
+	def test_can_be_contructed_from_function(self):
+		"""
+		Test that we can construct a model from a function that returns an
+		individual.
+		"""
+		##Make a function that returns a constan individual
+		def _const_ind():
+			return Individual(1,1,1,1)
+		myModel = Model.from_function( _const_ind, 12, 0.3,0.3,0.9 )
+		self.assertIsInstance(myModel, Model)
+		self.assertEqual( myModel.size, 12  )
+		self.assertEqual( myModel.delta, 0.9 )
+		self.assertEqual( myModel.Population.fairness, 1 )
+		self.assertEqual( myModel.Population.average_assortment, 1 )
 
 	##This just tests that it runs, proper function testing must take place
 	##in a notebook.
 	def test_go(self):
 		"""
-		Can't really test the whole model automatically in any detail, but
+		Can't really test the whole Model automatically in any detail, but
 		check that the whole thing can run, and the population stays the same
 		size
 
 		"""
 
-		myModel = model.from_random_pop( 16, h = 0.4, s = 0.4, delta =0.2)
+		myModel = Model.from_random_pop( 16, h = 0.4, s = 0.4, delta =0.2)
 		myModel.go()
-		self.assertEqual( len( myModel.population ), len( myModel.pop0 ) )
+		self.assertEqual( len( myModel.Population ), len( myModel.pop0 ) )
 		##Check that something has happened at least
-		self.assertNotEqual( myModel.population, myModel.pop0 )
+		self.assertNotEqual( myModel.Population, myModel.pop0 )
 
 	def test_records_fairness(self):
 		"""
@@ -85,9 +99,9 @@ class test_model(unittest.TestCase):
 		"""
 
 		gens = 26
-		pop = population.from_random(32)
+		pop = Population.from_random(32)
 		fairness0 = pop.fairness
-		myModel = model( pop, h = 0.4, s = 0.6, delta = 0.3, generations = gens)
+		myModel = Model( pop, h = 0.4, s = 0.6, delta = 0.3, generations = gens)
 		myModel.go()
 		self.assertEqual( len( myModel.fairness ), gens )
 		self.assertEqual( fairness0, myModel.fairness[0] )
@@ -98,9 +112,9 @@ class test_model(unittest.TestCase):
 		"""
 
 		gens = 26
-		pop = population.from_random(32)
+		pop = Population.from_random(32)
 		assort0 = pop.average_assortment
-		myModel = model( pop, h = 0.4, s = 0.6, delta = 0.3, generations = gens)
+		myModel = Model( pop, h = 0.4, s = 0.6, delta = 0.3, generations = gens)
 		myModel.go()
 		self.assertEqual( len( myModel.desired_assortment ), gens )
 		self.assertEqual( assort0, myModel.desired_assortment[0] )
@@ -111,7 +125,7 @@ class test_model(unittest.TestCase):
 		Check that they exist, and are sensible vaules.
 		"""
 
-		myModel = model.from_random_pop( 16, 0.4, 0.5, 0.1 )
+		myModel = Model.from_random_pop( 16, 0.4, 0.5, 0.1 )
 		myModel.go()
 		self.assertGreaterEqual( myModel.final_fairness, 0 )
 		self.assertLessEqual( myModel.final_fairness, 1 )
@@ -125,7 +139,7 @@ class test_model(unittest.TestCase):
 
 		"""
 
-		myModel = model.from_random_pop( 16, 0.4, 0.5, 0.1, graphs = False )
+		myModel = Model.from_random_pop( 16, 0.4, 0.5, 0.1, graphs = False )
 		myModel.go()
 		fig = myModel.make_graphs()
 		self.assertIsInstance( fig, mpl.figure.Figure )
