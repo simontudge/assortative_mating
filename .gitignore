@@ -3,3 +3,6 @@
 *.cache
 ##Ipython notebooks
 *.ipynb_checkpoints
+
+##HTML files written by coverage
+*htmlcov/*

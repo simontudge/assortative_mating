@@ -7,4 +7,4 @@ setup:
 	export PYTHONPATH="$HOME/evolution_of_assortative_mating/code:$PYTHONPATH"
 
 test:
-	py.test
+	py.test --cov-report term-missing --cov-report html --cov=assortative_mating tests/
