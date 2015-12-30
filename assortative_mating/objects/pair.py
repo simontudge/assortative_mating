@@ -47,15 +47,16 @@ class Pair(object):
 		"""
 		Returns the fitness of the pair, which is simply the mean fitness of the 
 		two individuals.
+		
 		"""
 		return 0.5*( self.I1.fitness(fitness_matrix) + self.I2.fitness(fitness_matrix) )
 
-	def make_child(self, delta):
+	def make_child(self, delta, mu_strat = 0.05, mu_assort = 0.1):
 		"""
 		Returns an individual which is the child of the two individuals in this pair.
 		Calls make gamete on each individual and combines to make another individual.
 
 		"""
-		a1, m1 = self.I1.make_gamete(delta = delta)
-		a2, m2 = self.I2.make_gamete(delta = delta)
-		return Individual(a1,a2, m1, m2)
+		a1, m1 = self.I1.make_gamete(delta = delta, mu_strat = mu_strat, mu_assort = mu_assort)
+		a2, m2 = self.I2.make_gamete(delta = delta, mu_strat = mu_strat, mu_assort = mu_assort)
+		return Individual( a1, a2, m1, m2)

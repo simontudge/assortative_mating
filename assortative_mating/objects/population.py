@@ -42,9 +42,12 @@ class Population(object):
 
 	def __len__(self):
 		"""
-		Returns the length of the population, defines as the total number of individuals.
+		Returns the length of the population, defined as the total number of individuals.
 		"""
 		return self.total_individuals
+
+	def __getitem__(self, i):
+		return self.individuals[i]
 
 	@classmethod
 	def from_random(cls, size):
@@ -83,7 +86,7 @@ class Population(object):
 			self.males.pop(index)
 		self.pairs = pairs
 
-	def new_generation(self, fitness_matrix, delta ):
+	def new_generation(self, fitness_matrix, delta, mu_strat = 0.05, mu_assort = 0.1 ):
 		"""
 		Creates and returns a new population which is the outcome of one generation of selection.
 		"""
@@ -91,7 +94,7 @@ class Population(object):
 			self.pair_population()
 		fitnesses = [ p.fitness( fitness_matrix ) for p in self.pairs ]
 		parents = random_choice( self.pairs, p = fitnesses, size = self.total_individuals )
-		children = [ p.make_child(delta) for p in parents ]
+		children = [ p.make_child(delta, mu_strat = mu_strat, mu_assort = mu_assort) for p in parents ]
 		return Population( children )
 
 	##########Metrics############
@@ -112,6 +115,30 @@ class Population(object):
 		"""
 		return np.mean( [ I.desired_assortment for I in self.individuals ] )
 
+	@property
+	def inbreeding(self):
+		"""
+		Returns the messured inbreeding, rather than the average desired assortment. This should
+		be roughly similiar to the avarage dedired assortment, but is measured as the outcome of the
+		actual pairing. It is the normalised covariance of the phenotypes of the individuals in each
+		pair.
+
+		"""
+
+		if self.pairs is None:
+			self.pair_population()
+
+		x = [ p[0].phenotypic_value for p in self.pairs ]
+		y = [ p[1].phenotypic_value for p in self.pairs ]
+		return np.corrcoef( x, y )[0,1]
+
+	def average_fitness( self, fitness_matrix ):
+		"""
+		Return the average fitness of the population, given a fitness matrix.
+
+		"""
+		return np.mean( [ I.fitness(fitness_matrix) for I in self.individuals ] )
+
 	#######Plots##############
 
 	def plot_scatter_pairs(self, ax = None, figsize = (16,9) ):
@@ -121,7 +148,7 @@ class Population(object):
 		annotations.
 		Inputs
 		======
-		ax : matplib axes {None}
+		ax : matplotlib axes {None}
 			Axes on which to make the plot, if none they will be created.
 		figsize : 2-tuple { (16,9 ) }
 			2-tuple denoting the figure size in inches
@@ -142,5 +169,5 @@ class Population(object):
 		
 		ax.scatter(x,y)
 		ax.set_xlabel("Female phenotype")
-		ax.set_xlabel("Male phenotype")
+		ax.set_ylabel("Male phenotype")
 		return ax.figure

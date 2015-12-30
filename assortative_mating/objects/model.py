@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from assortative_mating import Population
+import assortative_mating.helpers.game_theory_helpers as GT
 
 class Model():
 	"""
@@ -18,7 +19,8 @@ class Model():
 	well as parameters as methods for plotting and analysis.
 	"""
 
-	def __init__(self, pop, h, s, delta, generations = 128, graphs = True):
+	def __init__(self, pop, h, s, delta, generations = 128, graphs = True, check_inputs = True,
+		mu_strat = 0.05, mu_assort = 0.1):
 		"""
 		Construct a model, the model class contains a population, and all the parameters
 		needed to define a model. It handles iterating the model through multiple generations
@@ -43,19 +45,29 @@ class Model():
 			Number of decrete generations over which to select.
 		graphs : bool {True}
 			Whether or not to create the standard array of graphs
+		check_inputs : bool {True}
+			Checks inputs such as delta h and s to see if they are within sensible ranges.
+			This can be overridden by setting this to False, do this if you are sure the inputs are
+			right, or you are checking non-sensible inputs for means of control.
+		mu_strat : float [0,1] {0.05}:
+			Probability that a strategy is mutated when it is passed on.
+		mu_assort : float [0,1] {0,1}:
+			Probability that the assortment is mutated as it is passed on.
 		Raises
 		======
 		ValueError :
 			If delta < 0 or delta > 1. If s < 0 or > 1 or if h*s > 1.
+		
 		"""
 
 		##Raise value error if any of the conditions are violated
-		if delta < 0 or delta > 1:
-			raise ValueError ("Delta must be in [0,1], got {}".format(delta))
-		if s < 0 or s > 1:
-			raise ValueError ("s must be in [0,1], got {}".format(s))
-		if h*s > 1:
-			raise ValueError("h*s must be greater than 0, got {}".format(h*s))
+		if check_inputs:
+			if delta < 0 or delta > 1:
+				raise ValueError ("Delta must be in [0,1], got {}".format(delta))
+			if s < 0 or s > 1:
+				raise ValueError ("s must be in [0,1], got {}".format(s))
+			if h*s > 1:
+				raise ValueError("h*s must be less than 1, got {}".format(h*s))
 		##Set all input parameters
 		self.Population = pop
 		self.h = h
@@ -63,12 +75,14 @@ class Model():
 		self.delta = delta
 		self.generations = generations
 		self.graphs = graphs
+		self.mu_assort = mu_assort
+		self.mu_strat = mu_strat
 		##Check input values
 		omega_00 = 1 - s
 		omega_01 = 1 - h*s
 		omega_10 = omega_01
 		omega_11 = 1
-		self.fitness_matrix = np.array( [[ omega_00, omega_01 ],[ omega_10, omega_11 ] ] )
+		self.fitness_matrix = np.array( [ [ omega_00, omega_01 ],[ omega_10, omega_11 ] ] )
 		##Other usuful parametes
 		self.size = pop.total_individuals
 		##Save the intial state of the Population
@@ -117,21 +131,32 @@ class Model():
 		##Make the model from the population
 		return cls( pop, *args, **kwargs )
 
-	def make_graphs(self):
+	def make_graphs(self, ax = None, ESS = False):
 		"""
 		Returns a matplotlib figure. Plots to ax if provided, otherwise creates a figure from
 		scratch.
-
+ 
 		Plots both fairness and average assortment on the same figure.
+
+		If ESS is set to True then there will also be a dashed line for the predicted ESS of
+		the well mixed game.
 
 		"""
 
-		fig,ax = plt.subplots( figsize = (16,9) )
+		if ax is None:
+			_,ax = plt.subplots( figsize = (16,9) )
 		ax.plot( self.fairness, label = 'Fairness' )
 		ax.plot( self.desired_assortment, label = 'Desired Assortment' )
+		ax.plot( self.inbreeding, label = 'inbreeding' )
+		ax.plot( self.fitness, label = 'Fitness' )
 		ax.set_xlabel( "Generations" )
 		ax.legend()
-		return fig
+		if ESS:
+			ess_value = GT.ESS_h_s_delta( self.h, self.s, self.delta )
+			x_bound = ax.get_xbound() 
+			ax.plot( x_bound, [ ess_value ]*2, '--')
+
+		return ax.figure
 
 	def go(self):
 		"""
@@ -141,13 +166,19 @@ class Model():
 
 		self.fairness = []
 		self.desired_assortment = []
+		self.inbreeding = []
+		self.fitness = []
 		for i in range(self.generations):
 			##Record some metrics
 			self.fairness.append( self.Population.fairness)
 			self.desired_assortment.append( self.Population.average_assortment )
+			self.inbreeding.append( self.Population.inbreeding )
+			self.fitness.append( self.Population.average_fitness( self.fitness_matrix ) )
 			##Get the next generation
-			self.Population = self.Population.new_generation( fitness_matrix = self.fitness_matrix, delta = self.delta )
+			self.Population = self.Population.new_generation( fitness_matrix = self.fitness_matrix,\
+			 delta = self.delta, mu_strat = self.mu_strat, mu_assort = self.mu_assort )
 			
+
 		##Set some final metrics, which are useful for classes and functions that sweep this model
 		self.final_fairness = self.Population.fairness
 		self.final_desired_assortment = self.desired_assortment[0]

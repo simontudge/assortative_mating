@@ -139,7 +139,18 @@ class test_model(unittest.TestCase):
 
 		"""
 
-		myModel = Model.from_random_pop( 16, 0.4, 0.5, 0.1, graphs = False )
+		myModel = Model.from_random_pop( 16, 0.4, 0.5, 0.1, graphs = False)
 		myModel.go()
 		fig = myModel.make_graphs()
 		self.assertIsInstance( fig, mpl.figure.Figure )
+
+	def test_model_handles_mutation(self):
+		"""
+		Run the model for one generation, and see that mutation is taking effect.
+		"""
+
+		mod = Model.from_random_pop( 16, 0.4, 0.5, 0.1, graphs = False,\
+		 generations = 1, mu_strat = 0.5, mu_assort = 0 )
+		mod.go()
+		##We're bascially just checking that this runs, so this is just a minimal test
+		self.assertIsInstance(mod,Model)

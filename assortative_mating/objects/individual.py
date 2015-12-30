@@ -118,7 +118,7 @@ class Individual(object):
 	def choose_mate(self, mates ):
 		"""
 		Choose a mate at "Random" based on a list of potential mates.
-		The choice depends in the individuals desried_assortment (A).
+		The choice depends in the individuals desired_assortment (A).
 		With probability A they choose a mate of the same phenotype as
 		themselves, and with probability 1 - A they choose a random mate.
 
@@ -133,32 +133,26 @@ class Individual(object):
 		all_mates = list( enumerate(mates) )
 
 		if random.random() < self.desired_assortment:
-			#print("Yes")
 			##Then we choose a mate who is clonally related
 			potential_mates = [ p for p in all_mates if p[1].phenotypic_value == self.phenotypic_value ]
 			##In the special case where there are no identical mates to choose from we'll just choose
 			##at random.
 			if len(potential_mates) == 0:
-			#	print ("Here")
 				potential_mates = all_mates
 		else:
-			#print("No")
 			##Choose a mate at random
 			potential_mates = all_mates
-
-		#print(len(potential_mates) )
-		#print(list(potential_mates))
-		#print(list(all_mates))
 
 		return random_choice( potential_mates )
 		
 
-	def make_gamete(self, delta):
+	def make_gamete(self, delta, mu_strat = 0.05, mu_assort = 0.1):
 		"""
 		Returns a gamete, i.e. a gene a and a gene m.
 		Which genes are chossen depends firstly on whether
 		crossover takes place, and also on whether the individual
 		contains any meiotic distorter alleles.
+		Needs also mu_strat and mu_assort. See Individual.mutate_gamete.
 		"""
 		##Choose whether to crossover or not
 		if random.random() < self.crossover:
@@ -180,7 +174,8 @@ class Individual(object):
 			if not do_crossover:
 				gamete_a = self.a2
 
-		return gamete_a, gamete_m
+		gamete = gamete_a, gamete_m
+		return self.mutate_gamete( gamete, mu_strat, mu_assort )
 
 	def fitness(self, fitnes_matrix):
 		"""
@@ -190,13 +185,46 @@ class Individual(object):
 		return fitnes_matrix[ self.m1, self.m2 ]
 
 	@staticmethod
-	def mutate_gamete(gamete):
+	def mutate_gamete(gamete, mu_strat = 0.05, mu_assort = 0.1):
 		"""
-		Mutate the gamete according to some rules I have not yet decided.
+		Takes a gamete and with specifed probabilities returns a mutated copy of the gamete.
+		Inputs:
+		=======
+		gamete: (float, int):
+			A gamete to be mutated. A gamete is represented by a tuple which contains the value
+			of the two genes in the form (g_a, g_m).
+		mu_strat : float {0.05}
+			Probabilty with which the gamete will be mutated
+		mu_assort: float {0.1}
+			Probability with which the assortment will be mutated.
+		Notes
+		=====
+		The gene for the strategy is a binary number. With probability mu_strat the allele which switch
+		to the other version of the strategy.
+		The gene for assortment is real number between zero and one. It is mutated with probability mu_assort.
+		In which case a random ammount is added or subtracted to the value. This is drawn from the gaussian
+		distribution with mean zero and standard deviation 0.05. Furthermore the returned value is scaled to
+		lie within 0 and 1.
 		"""
-		pass
+		old_a, old_m = gamete
+		##Do the strategy
+		if random.random() < mu_strat:
+			new_m = ( old_m + 1 )%2
+		else:
+			new_m = old_m
+		##Now do the assortment bit
+		if random.random() < mu_assort:
+			new_a = old_a + random.normal( 0, 0.05 )
+			if new_a > 1:
+				new_a = 1
+			elif new_a < 0:
+				new_a = 0
+		else:
+			new_a = old_a
+		return ( new_a, new_m )
+		
 
-########Some helper methods for the individual, if there are many of these migtht consider having
+########Some helper methods for the individual, if there are many of these might consider having
 #them in a seperate file, e.g. helpers.individual_helpers. For now just have them here.
 
 def constant_assortment_individual( assortment, **kwargs):

@@ -82,7 +82,7 @@ class test_pair(unittest.TestCase):
 		myPair = Pair(I1,I2)
 		##Repeat a few time to be safe
 		for _ in range(64):
-			child = myPair.make_child(delta = 0.5)
+			child = myPair.make_child(delta = 0.5, mu_strat = 0, mu_assort = 0)
 			##The child must have an a value of 1 and one of 0 and likewise for m
 			self.assertEqual( child.a1 + child.a2, 1 )
 			self.assertEqual( child.m1 + child.m2, 1 )

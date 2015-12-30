@@ -157,7 +157,7 @@ class test_population(unittest.TestCase):
 		##Make the fitnesses exactly addative, for ease
 		M = np.array( [ [ 0, 0.5 ],[ 0.5, 1. ] ] )
 		delta = 0
-		new_pops = [ pop.new_generation(M,delta = delta) for _ in range(5000) ]
+		new_pops = [ pop.new_generation(M,delta = delta, mu_strat = 0, mu_assort = 0) for _ in range(5000) ]
 		##We shhould have ratios of roughly 2:1:0 for phenotypic values of 1:0.5:0
 		##Making the mean 2.5/3 = 
 		mean_fairness = np.mean( [ p.fairness for p in new_pops ]  )

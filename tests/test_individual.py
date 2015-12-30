@@ -188,26 +188,26 @@ class test_individual(unittest.TestCase):
 		#With delta = 0 these should be chossen at random
 		delta = 0
 		total_samples = 100000
-		I0_gametes = [ I0.make_gamete( delta = delta ) for _ in range(total_samples) ]
+		I0_gametes = [ I0.make_gamete( delta = delta, mu_strat = 0, mu_assort = 0 ) for _ in range(total_samples) ]
 		self.assertAlmostEqual( I0_gametes.count( (1,0) )/total_samples, 0.5, places = 2  )
 		self.assertAlmostEqual( I0_gametes.count( (0,0) )/total_samples, 0.5, places = 2  )
 
-		I2_gametes = [ I2.make_gamete( delta = delta ) for _ in range(total_samples) ]
+		I2_gametes = [ I2.make_gamete( delta = delta, mu_strat = 0, mu_assort = 0 ) for _ in range(total_samples) ]
 		self.assertAlmostEqual( I2_gametes.count( (0,1) )/total_samples, 0.5, places = 2 )
 		self.assertAlmostEqual( I2_gametes.count( (1,0) )/total_samples, 0.5, places = 2 )  
 
 		##Try with an intermediate value of delta
 		delta = 0.4
-		I2_gametes = [ I2.make_gamete( delta = delta ) for _ in range(total_samples) ]
+		I2_gametes = [ I2.make_gamete( delta = delta, mu_strat = 0, mu_assort = 0 ) for _ in range(total_samples) ]
 		self.assertAlmostEqual( I2_gametes.count( (0,1) )/total_samples, 0.5*(1-delta), places = 2 )
-		I1_gametes = [ I1.make_gamete( delta = delta ) for _ in range(total_samples) ]
+		I1_gametes = [ I1.make_gamete( delta = delta, mu_strat = 0, mu_assort = 0 ) for _ in range(total_samples) ]
 		self.assertAlmostEqual( I1_gametes.count( (1,0) )/total_samples, 0.5*(1+delta), places = 2 )
 
 
 		##With extreme value of delta
 		delta = 1
-		self.assertEqual( I1.make_gamete( delta = delta ), ( 1, 0 ) )
-		I0_gametes = [ I0.make_gamete( delta = delta ) for _ in range(total_samples) ]
+		self.assertEqual( I1.make_gamete( delta = delta, mu_strat = 0, mu_assort = 0 ), ( 1, 0 ) )
+		I0_gametes = [ I0.make_gamete( delta = delta, mu_strat = 0, mu_assort = 0 ) for _ in range(total_samples) ]
 		self.assertAlmostEqual( I0_gametes.count( (1,0) )/total_samples, 0.5, places = 2 )
 
 	def test_make_gametes_with_crossover(self):
@@ -218,7 +218,7 @@ class test_individual(unittest.TestCase):
 		crossover = 0
 		#Test Individual
 		I = Individual(1,0,1,0, crossover = crossover)
-		gametes = [ I.make_gamete(delta = 0) for _ in range(1000) ]
+		gametes = [ I.make_gamete(delta = 0, mu_strat = 0, mu_assort = 0) for _ in range(1000) ]
 		self.assertNotIn( (1,0), gametes )
 		self.assertNotIn( (0,1), gametes )
 
@@ -229,13 +229,13 @@ class test_individual(unittest.TestCase):
 		##haplotype (1,0). 60% of the time we'll choose at random, so we should see
 		##the haplotype 1,0 15% of the time
 		total_samples = 50000
-		gametes = [ I.make_gamete(delta = 0) for _ in range(total_samples) ]
+		gametes = [ I.make_gamete(delta = 0, mu_strat = 0, mu_assort = 0) for _ in range(total_samples) ]
 		self.assertAlmostEqual( gametes.count( (1,0) )/total_samples, 0.15, places = 2 )
 
 		crossover = 1.0
 		##Regardless of delta we should see the two variants of a appearing equally often
 		I = Individual(1,0,1,0, crossover = crossover)
-		gametes = [ I.make_gamete(delta = random.random() ) for _ in range(total_samples) ]
+		gametes = [ I.make_gamete(delta = random.random(), mu_strat = 0, mu_assort = 0 ) for _ in range(total_samples) ]
 		ms = [ g[0] for g in gametes ]
 		self.assertAlmostEqual( ms.count(1)/total_samples, 0.5, places = 2 )
 
@@ -258,14 +258,6 @@ class test_individual(unittest.TestCase):
 		self.assertEqual( I2.fitness(fitness_matrix), 0.1 ) 
 		self.assertEqual( I3.fitness(fitness_matrix), 0 ) 
 
-class test_mutation(unittest.TestCase):
-
-	def test_mutate_gamete(self):
-		"""
-		Test that the mutation of gametes behaves as expected.
-		"""
-		pass
-
 class test_individual_helpers(unittest.TestCase):
 	"""
 	Class for testing all the helper functions in the Individual.py file.
@@ -283,3 +275,81 @@ class test_individual_helpers(unittest.TestCase):
 		self.assertAlmostEqual( np.mean( [ i.desired_assortment for i in inds] ), 0.3 )
 		self.assertAlmostEqual( np.var( [ i.desired_assortment for i in inds] ), 0. )
 		self.assertEqual( inds[0].crossover, 0.3 )
+
+class test_mutation(unittest.TestCase):
+
+	def setUp(self):
+		self.test_gamete = ( 0.4, 1 )
+		##Make an array of mutated gamete to test with
+		self.total_trials = 50000
+		self.mutated = [ Individual.mutate_gamete( self.test_gamete, mu_strat = 0.3, mu_assort = 0.2 ) for _ in range(self.total_trials) ]
+		self.mutated_strategies = [ m[1] for m in self.mutated ]
+		self.mutated_assort = [ m[0] for m in self.mutated ]
+
+	def _is_gamete(self,g):
+		"""
+		Check to see if the input is a valid gamete.
+		"""
+		
+		if not isinstance(g,tuple):
+			return False
+		elif len(g) != 2:
+			return False
+		elif g[0] < 0 or g[0] > 1:
+			return False
+		elif g[1] not in [0,1]:
+			return False
+		else:
+			return True
+
+
+	def test_mutation_returns_gamete(self):
+		"""
+		Test that the mutation function returns some kind of valid gamete.
+		"""
+		self.assertTrue( self._is_gamete( Individual.mutate_gamete( self.test_gamete ) ) )
+
+	def test_mutation_does_nothing_with_zero_parameters(self):
+		"""
+		If both of the mutation parameters are set to zero, the returned gamete should be the same as the
+		input.
+
+		"""
+
+		self.assertEqual( Individual.mutate_gamete( self.test_gamete, 0, 0 ), self.test_gamete )
+
+	def test_mutate_strat(self):
+		"""
+		Test strategy mutation. If we repeatedly mutate our test gamete we can test that this is within
+		sensible bounds.
+
+		"""
+
+		total_mutated = self.mutated_strategies.count(0)/self.total_trials
+		self.assertAlmostEqual( total_mutated, 0.3, places = 2 )
+
+	def test_mutate_assort(self):
+		"""
+		Check the statisitcal properties of the mutated assortment genes.
+		"""
+
+		#The mean should be roughly the same
+		self.assertAlmostEqual( np.mean( self.mutated_assort ), 0.4, places = 2 )
+
+		##The number mutated should be roughly equal to this
+		self.assertAlmostEqual( self.mutated_assort.count(0.4)/self.total_trials, 0.8, places = 2 )
+
+		##The standard deviation of those that are mutated should be close to this
+		self.assertAlmostEqual( np.std( [ g_m for g_m in self.mutated_assort if g_m != 0.4 ] ), 0.05, places = 2 )
+
+	def test_mutate_assort_doesnt_leave_intervale(self):
+		"""
+		Make sure that gametes close to the boundary don't leave the interval.
+
+		"""
+
+		Min =  min( [ Individual.mutate_gamete( (0,1) )[0] for _ in range(1000) ] )
+		self.assertEquals(Min , 0)
+
+		Max =  max( [ Individual.mutate_gamete( (1,1) )[0] for _ in range(1000) ] )
+		self.assertEquals(Max, 1)
