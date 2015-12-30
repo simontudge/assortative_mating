@@ -11,7 +11,7 @@ import numpy as np
 ##list, and secondly the weight must sum to one.
 def random_choice(input_iterable, p = None, size = None, replacement = True, with_index = False):
 	"""
-	Choose at random from the list, potentially wieghted with the
+	Choose at random from the list, potentially weighted with the
 	list of wiegths p. Set replacement = False to sample without
 	replacement, default = True.
 

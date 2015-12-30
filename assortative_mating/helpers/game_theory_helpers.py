@@ -10,7 +10,7 @@ def get_ST(h,s,delta):
 	delta. Returns as a tuple (S,T).
 	"""
 	S = ( ( 1 - delta )*( 1 - h*s ) - ( 1 - s ) )/s
-	T = ( ( 1 + delta )*( 1 - h*s )-( 1 - s ) )/s
+	T = ( ( 1 + delta )*( 1 - h*s ) - ( 1 - s ) )/s
 	return S,T
 
 ##Convert from S and T to h,s and delta
@@ -20,7 +20,7 @@ def get_ST(h,s,delta):
 def ESS(S,T):
 	r"""
 	Returns the ESS in terms of x, frequency of cooperate, give S and T.
-	For bistable game, (i.e. the stag-hunt) game returns the frequency reach
+	For bistable game, (i.e. the stag-hunt) game returns the frequency reached
 	if the population starts at 50% cooperate.
 	"""
 	 ##PD
