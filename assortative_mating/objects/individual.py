@@ -23,7 +23,7 @@ class Individual(object):
 		being an individual who always tries to mate assortativly in in the maximum
 		sence, and zero being an individual who mates at random.
 		The other gene is the value of the meotic disstorter and can be either 0, always
-		distorts aka a defctor, or 1, doesn't distort aka a cooperator.
+		distorts aka a defector, or 1, doesn't distort aka a cooperator.
 		Each gene has two copies as the individuals are diploid.
 		
 		Inputs

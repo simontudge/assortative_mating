@@ -1,8 +1,12 @@
 ##Caches
 *__pycache__*
 *.cache
+*.pyc
 ##Ipython notebooks
 *.ipynb_checkpoints
+
+##Unititled ipython notebooks
+*Untitled*.ipynb
 
 ##HTML files written by coverage
 *htmlcov/*
